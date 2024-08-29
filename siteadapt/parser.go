@@ -197,5 +197,5 @@ func filterText(text string, filters []Filter, trimChars bool) (string, error) {
 		}
 		text = ft
 	}
-	return text, nil
+	return strings.TrimSpace(text), nil
 }
