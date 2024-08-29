@@ -2,43 +2,11 @@ package btsite
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 )
 
 var SiteHelper = new(helper)
 
 type helper struct {
-}
-
-func (sh *helper) GetFaviconPath(site Site, storePath string) (string, error) {
-	// 读取 data/favicon
-	filename := filepath.Join(storePath, site.Code+".ico")
-	_, err := os.Stat(filename)
-	if err != nil && os.IsNotExist(err) {
-		return "", fmt.Errorf("站点 favicon 不存在: %s", filename)
-	}
-	return filename, nil
-}
-
-func (sh *helper) SaveFavicon(data []byte, site *Site, storePath string) error {
-	// 保存到 data/favicon
-	filename := filepath.Join(storePath, site.Code+".ico")
-	// 确保目录存在
-	dir := filepath.Dir(filename)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return fmt.Errorf("创建目录失败: %s", dir)
-	}
-	file, err := os.Create(filename)
-	if err != nil {
-		return fmt.Errorf("创建 favicon 失败: %s", filename)
-	}
-	defer file.Close()
-	_, err = file.Write(data)
-	if err != nil {
-		return fmt.Errorf("保存 favicon 失败: %s", filename)
-	}
-	return nil
 }
 
 func (sh *helper) GetConfigByCode(code string) (Config, error) {
