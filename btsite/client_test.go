@@ -15,6 +15,7 @@ func TestMain(m *testing.M) {
 	client, _ = btsite.NewClient(context.Background(), &btsite.Site{
 		Code:      os.Getenv("GO_BTSITE_CODE"),
 		Name:      os.Getenv("GO_BTSITE_NAME"),
+		UserId:    os.Getenv("GO_BTSITE_USER_ID"),
 		UserAgent: os.Getenv("GO_BTSITE_UA"),
 		Cookie:    os.Getenv("GO_BTSITE_COOKIE"),
 		RssUrl:    os.Getenv("GO_BTSITE_RSS_URL"),
@@ -32,6 +33,10 @@ func TestUserBasicInfo(t *testing.T) {
 func TestUserDetails(t *testing.T) {
 	details, err := client.UserDetails()
 	log(details, err, t)
+	if details.LevelIcon != "" {
+		data, err := client.DownloadFile(details.LevelIcon)
+		log(data, err, t)
+	}
 }
 
 func TestSeedingStatistics(t *testing.T) {

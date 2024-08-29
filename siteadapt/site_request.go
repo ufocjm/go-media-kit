@@ -41,7 +41,11 @@ func (cr *siteRequest) request(rd RequestDefinition) (*http.Response, error) {
 			}
 		}
 	}
-	requestUrl := cr.replacePlaceholders(cr.newRequestUrl(rd))
+	requestUrl, err := cr.newRequestUrl(rd)
+	if err != nil {
+		return nil, cr.newError("创建请求地址失败", err)
+	}
+	requestUrl = cr.replacePlaceholders(requestUrl)
 	header := http.Header{}
 	// header 的优先级：自定义请求头 > 站点配置请求头 > 默认请求头
 	// 默认请求头
@@ -114,9 +118,9 @@ func (cr *siteRequest) replaceUrlValues(values url.Values) url.Values {
 	return newValues
 }
 
-func (cr *siteRequest) newRequestUrl(rd RequestDefinition) string {
+func (cr *siteRequest) newRequestUrl(rd RequestDefinition) (string, error) {
 	if netx.IsValidHttpUrl(rd.Path) {
-		return rd.Path
+		return rd.Path, nil
 	} else {
 		baseUrl := ""
 		if rd.UseApi {
@@ -124,6 +128,6 @@ func (cr *siteRequest) newRequestUrl(rd RequestDefinition) string {
 		} else {
 			baseUrl = cr.sc.Domain
 		}
-		return baseUrl + rd.Path
+		return netx.JoinURL(baseUrl, rd.Path)
 	}
 }
