@@ -48,14 +48,14 @@ func (c *ApiClient) request(urlStr string, method string, params map[string]stri
 			p.Add(k, v)
 		}
 	}
-	resp, err := netx.NewHttpx(netx.HttpRequestConfig{
+	resp, err := netx.NewHttpx(netx.HttpRequestParams{
 		Ctx:     nil,
 		Url:     urlStr,
 		Params:  p,
 		Cookie:  "",
 		Ua:      ua,
 		Referer: referer,
-	}).Get()
+	}).Request()
 	if err != nil {
 		return nil, err
 	}

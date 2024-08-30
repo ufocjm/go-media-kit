@@ -89,11 +89,11 @@ func (s *mgService) list(mediaType string, params mgListParams) (Result, error) 
 	if params.fitAge != "" {
 		p.Set("fitAge", params.fitAge)
 	}
-	resp, err := netx.NewHttpx(netx.HttpRequestConfig{
+	resp, err := netx.NewHttpx(netx.HttpRequestParams{
 		Url:     "https://pianku.api.mgtv.com/rider/list/pcweb/v3",
 		Params:  p,
 		Referer: "https://www.mgtv.com/",
-	}).Get()
+	}).Request()
 	if err != nil {
 		return Result{}, err
 	}

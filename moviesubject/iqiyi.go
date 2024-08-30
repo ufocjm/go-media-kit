@@ -87,11 +87,11 @@ func (s *iqyService) data(mediaType string, params iqyDataParams) (Result, error
 		"vip":        {"0"},
 		"filter":     {strings.ReplaceAll(string(filter), `"`, `\"`)},
 	}
-	resp, err := netx.NewHttpx(netx.HttpRequestConfig{
+	resp, err := netx.NewHttpx(netx.HttpRequestParams{
 		Url:     "https://mesh.if.iqiyi.com/portal/lw/videolib/data",
 		Params:  p,
 		Referer: "https://www.iqiyi.com/",
-	}).Get()
+	}).Request()
 	if err != nil {
 		return Result{}, err
 	}

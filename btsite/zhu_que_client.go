@@ -70,7 +70,7 @@ func (c *zhuQueClient) Search(searchParams SearchParams) ([]SearchTorrent, error
 	}
 	var torrents []SearchTorrent
 	for _, torrent := range searchTorrents {
-		pageUrl, err := netx.JoinURL(domain, torrent.PageUrl)
+		pageUrl, err := netx.JoinUrl(domain, torrent.PageUrl)
 		if err != nil {
 			return nil, err
 		}

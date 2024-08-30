@@ -5,6 +5,7 @@ import (
 	"github.com/heibizi/go-media-kit/core/utils/netx"
 	"github.com/heibizi/go-media-kit/core/utils/stringx"
 	"github.com/tidwall/gjson"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -61,7 +62,7 @@ func (s *vqqService) getPageData(mediaType string, channelId string, sort string
 			"page_index": strconv.Itoa(pageNum),
 		},
 	}
-	resp, err := netx.NewHttpx(netx.HttpRequestConfig{Url: urlStr, Params: p, Referer: "https://v.qq.com/"}).Post(nil, data)
+	resp, err := netx.NewHttpx(netx.HttpRequestParams{Method: http.MethodPost, Url: urlStr, Params: p, Referer: "https://v.qq.com/", Body: data}).Request()
 	if err != nil {
 		return Result{}, err
 	}

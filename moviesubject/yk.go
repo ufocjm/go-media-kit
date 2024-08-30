@@ -88,7 +88,7 @@ func (s *ykService) data(mediaType string, params ykDataParams) (Result, error) 
 		"optionRefresh": {"1"},
 		"pageNo":        {strconv.Itoa(params.pageNum)},
 	}
-	resp, err := netx.NewHttpx(netx.HttpRequestConfig{Url: "https://youku.com/category/data", Params: p, Referer: "https://youku.com/"}).Get()
+	resp, err := netx.NewHttpx(netx.HttpRequestParams{Url: "https://youku.com/category/data", Params: p, Referer: "https://youku.com/"}).Request()
 	if err != nil {
 		return Result{}, err
 	}

@@ -6,12 +6,12 @@ import (
 )
 
 func (c *Client) Version() (version string, err error) {
-	resp, err := netx.NewHttpx(netx.HttpRequestConfig{
+	resp, err := netx.NewHttpx(netx.HttpRequestParams{
 		Ctx:     c.config.Ctx,
 		Url:     c.config.Host + "/api/v2/app/version",
 		Referer: c.config.Host,
 		Cookie:  c.ck,
-	}).Get()
+	}).Request()
 	if err != nil || resp.StatusCode != 200 {
 		return "", fmt.Errorf("获取版本失败: %v", err)
 	}

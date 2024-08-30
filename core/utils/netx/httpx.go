@@ -16,29 +16,32 @@ import (
 )
 
 type Httpx struct {
-	config HttpRequestConfig
-	resp   *http.Response
+	params HttpRequestParams
 }
 
-func NewHttpx(config HttpRequestConfig) *Httpx {
-	if config.Timeout == 0 {
-		config.Timeout = time.Second * 60
+func NewHttpx(params HttpRequestParams) *Httpx {
+	if params.Method == "" {
+		params.Method = http.MethodGet
 	}
-	if config.MaxIdleConn == 0 {
-		config.MaxIdleConn = 10
+	if params.Timeout == 0 {
+		params.Timeout = time.Second * 60
 	}
-	if config.IdleConnTimeout == 0 {
-		config.IdleConnTimeout = time.Second * 60
+	if params.MaxIdleConn == 0 {
+		params.MaxIdleConn = 10
 	}
-	return &Httpx{
-		config: config,
+	if params.IdleConnTimeout == 0 {
+		params.IdleConnTimeout = time.Second * 60
 	}
+	return &Httpx{params: params}
 }
 
-type HttpRequestConfig struct {
+type HttpRequestParams struct {
 	Ctx             context.Context // 上下文
+	Method          string          // 请求方法
 	Url             string          // 请求地址
 	Params          url.Values      // 请求参数
+	FormData        url.Values      // 请求表单
+	Body            any             // 请求体, io.Reader、[]byte、string、map、struct
 	Header          http.Header     // 请求头
 	Cookie          string          // Cookie
 	Ua              string          // UserAgent
@@ -50,45 +53,23 @@ type HttpRequestConfig struct {
 	IdleConnTimeout time.Duration   // 空闲连接超时
 }
 
-func (h *Httpx) Get() (*http.Response, error) {
-	return h.Request(http.MethodGet, nil, nil)
-}
-
-func (h *Httpx) GetAndDecode(output any) (*http.Response, error) {
-	resp, err := h.Get()
-	if err != nil {
-		return resp, err
-	}
-	return resp, Decode(resp, output)
-}
-
-func (h *Httpx) Post(formData url.Values, body any) (*http.Response, error) {
-	return h.Request(http.MethodPost, formData, body)
-}
-
-func (h *Httpx) PostAndDecode(formData url.Values, body any, output any) (*http.Response, error) {
-	resp, err := h.Post(formData, body)
-	if err != nil {
-		return nil, err
-	}
-	return resp, Decode(resp, output)
-}
-
-func (h *Httpx) newRequest(method string, formData url.Values, body any) (req *http.Request, err error) {
-	u, err := url.Parse(h.config.Url)
+func (h *Httpx) NewRequest() (req *http.Request, err error) {
+	params := h.params
+	u, err := url.Parse(params.Url)
 	if err != nil {
 		return nil, fmt.Errorf("url 处理错误: %v", err)
 	}
 	query := u.Query()
-	for k, vs := range h.config.Params {
+	for k, vs := range params.Params {
 		for _, v := range vs {
 			query.Add(k, v)
 		}
 	}
 	u.RawQuery = query.Encode()
 	var bodyReader io.Reader
-	if len(formData) > 0 {
-		bodyReader = bytes.NewBufferString(formData.Encode())
+	body := params.Body
+	if len(params.FormData) > 0 {
+		bodyReader = bytes.NewBufferString(params.FormData.Encode())
 	} else if body != nil {
 		if b, ok := body.(io.Reader); ok {
 			bodyReader = b
@@ -106,61 +87,89 @@ func (h *Httpx) newRequest(method string, formData url.Values, body any) (req *h
 			bodyReader = buf
 		}
 	}
-	if h.config.Ctx != nil {
-		req, err = http.NewRequestWithContext(h.config.Ctx, method, u.String(), bodyReader)
+	if params.Ctx != nil {
+		req, err = http.NewRequestWithContext(params.Ctx, params.Method, u.String(), bodyReader)
 	} else {
-		req, err = http.NewRequest(method, u.String(), bodyReader)
+		req, err = http.NewRequest(params.Method, u.String(), bodyReader)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("创建请求异常: %v", err)
 	}
-	if h.config.ContentType != "" {
-		req.Header.Set("Content-Type", h.config.ContentType)
-	} else if len(formData) > 0 {
+	if params.ContentType != "" {
+		req.Header.Set("Content-Type", params.ContentType)
+	} else if len(params.FormData) > 0 {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	} else if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
-	for k, vs := range h.config.Header {
+	for k, vs := range params.Header {
 		for _, v := range vs {
 			req.Header.Add(k, v)
 		}
 	}
-	if h.config.Ua != "" {
-		req.Header.Set("User-Agent", h.config.Ua)
+	if params.Ua != "" {
+		req.Header.Set("User-Agent", params.Ua)
 	}
-	if h.config.Cookie != "" {
-		req.Header.Set("Cookie", h.config.Cookie)
+	if params.Cookie != "" {
+		req.Header.Set("Cookie", params.Cookie)
 	}
-	if h.config.Referer != "" {
-		req.Header.Set("Referer", h.config.Referer)
+	if params.Referer != "" {
+		req.Header.Set("Referer", params.Referer)
 	}
 	return req, err
 }
 
-func (h *Httpx) Request(method string, formData url.Values, body any) (*http.Response, error) {
-	req, err := h.newRequest(method, formData, body)
-	if err != nil {
-		return nil, err
-	}
-	tp, err := NewHttpTransport(h.config.Proxy)
+func (h *Httpx) NewClient() (*http.Client, error) {
+	tp, err := NewHttpTransport(h.params.Proxy)
 	if err != nil {
 		return nil, err
 	}
 	if tp == nil {
 		tp = &http.Transport{}
 	}
-	tp.MaxIdleConns = h.config.MaxIdleConn
-	tp.IdleConnTimeout = h.config.IdleConnTimeout
+	tp.MaxIdleConns = h.params.MaxIdleConn
+	tp.IdleConnTimeout = h.params.IdleConnTimeout
 	client := &http.Client{
-		Timeout:   h.config.Timeout,
+		Timeout:   h.params.Timeout,
 		Transport: tp,
+	}
+	return client, nil
+}
+
+func (h *Httpx) Request() (*http.Response, error) {
+	req, err := h.NewRequest()
+	if err != nil {
+		return nil, err
+	}
+	client, err := h.NewClient()
+	if err != nil {
+		return nil, err
 	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("请求异常: %v", err)
 	}
 	return resp, nil
+}
+
+func (h *Httpx) Decode(output any) (*http.Response, error) {
+	resp, err := h.Request()
+	if err != nil {
+		return resp, err
+	}
+	return resp, Decode(resp, output)
+}
+
+func (h *Httpx) Body() ([]byte, *http.Response, error) {
+	resp, err := h.Request()
+	if err != nil {
+		return nil, nil, err
+	}
+	body, err := GetBody(resp)
+	if err != nil {
+		return nil, nil, err
+	}
+	return body, resp, nil
 }
 
 func NewHttpTransport(proxyUrl string) (*http.Transport, error) {
@@ -196,14 +205,14 @@ func IsValidHttpUrl(url string) bool {
 	return strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://")
 }
 
-// JoinURL 将基准 Url 和相对 Url 拼接在一起，返回完整的 Url
-func JoinURL(baseURL, relativeURL string) (string, error) {
-	base, err := url.Parse(baseURL)
+// JoinUrl 将基准 Url 和相对 Url 拼接在一起，返回完整的 Url
+func JoinUrl(baseUrl, relativeUrl string) (string, error) {
+	base, err := url.Parse(baseUrl)
 	if err != nil {
 		return "", fmt.Errorf("error parsing base Url: %v", err)
 	}
 
-	rel, err := url.Parse(relativeURL)
+	rel, err := url.Parse(relativeUrl)
 	if err != nil {
 		return "", fmt.Errorf("error parsing relative Url: %v", err)
 	}

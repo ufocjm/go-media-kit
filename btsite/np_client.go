@@ -137,7 +137,7 @@ func (c *npClient) Search(searchParams SearchParams) ([]SearchTorrent, error) {
 		if netx.IsValidHttpUrl(torrent.PageUrl) {
 			pageUrl = torrent.PageUrl
 		} else {
-			detailLink, err := netx.JoinURL(requestUrl, torrent.PageUrl)
+			detailLink, err := netx.JoinUrl(requestUrl, torrent.PageUrl)
 			if err != nil {
 				return nil, newError(site, err, "搜索种子拼接 details 错误")
 			}
@@ -145,7 +145,7 @@ func (c *npClient) Search(searchParams SearchParams) ([]SearchTorrent, error) {
 		}
 		if torrent.Enclosure != "" {
 			if !netx.IsValidHttpUrl(torrent.Enclosure) && !strings.HasPrefix(torrent.Enclosure, "magnet") {
-				enclosureLink, err := netx.JoinURL(requestUrl, torrent.Enclosure)
+				enclosureLink, err := netx.JoinUrl(requestUrl, torrent.Enclosure)
 				if err != nil {
 					return nil, newError(site, err, "搜索种子解析 download 错误")
 				}
@@ -269,7 +269,7 @@ func (c *npClient) Messages(page int) ([]Message, error) {
 	}
 	for i := range o {
 		message := &o[i]
-		detailUrl, err := netx.JoinURL(requestUrl, message.Link)
+		detailUrl, err := netx.JoinUrl(requestUrl, message.Link)
 		if err != nil {
 			return nil, err
 		}

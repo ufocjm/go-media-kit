@@ -84,13 +84,16 @@ func (cr *siteRequest) request(rd RequestDefinition) (*http.Response, error) {
 	} else {
 		body = cr.rsp.Body
 	}
-	resp, err := netx.NewHttpx(netx.HttpRequestConfig{
-		Ctx:    cr.rsp.Ctx,
-		Url:    requestUrl,
-		Params: rd.Params,
-		Header: header,
-		Proxy:  cr.rsp.Proxy,
-	}).Request(rd.Method, rd.FormData, body)
+	resp, err := netx.NewHttpx(netx.HttpRequestParams{
+		Ctx:      cr.rsp.Ctx,
+		Method:   rd.Method,
+		Url:      requestUrl,
+		Params:   rd.Params,
+		FormData: rd.FormData,
+		Body:     body,
+		Header:   header,
+		Proxy:    cr.rsp.Proxy,
+	}).Request()
 	if err != nil {
 		return nil, cr.newError("请求站点 %s 异常: %v", requestUrl, err)
 	}
@@ -128,6 +131,6 @@ func (cr *siteRequest) newRequestUrl(rd RequestDefinition) (string, error) {
 		} else {
 			baseUrl = cr.sc.Domain
 		}
-		return netx.JoinURL(baseUrl, rd.Path)
+		return netx.JoinUrl(baseUrl, rd.Path)
 	}
 }

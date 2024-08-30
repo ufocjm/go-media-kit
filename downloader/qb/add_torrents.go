@@ -6,6 +6,7 @@ import (
 	"github.com/heibizi/go-media-kit/core/utils/netx"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 )
@@ -62,13 +63,15 @@ func (c *Client) AddTorrents(req any) error {
 			}
 		}
 	}
-	resp, err := netx.NewHttpx(netx.HttpRequestConfig{
+	resp, err := netx.NewHttpx(netx.HttpRequestParams{
 		Ctx:         c.config.Ctx,
+		Method:      http.MethodPost,
 		Url:         c.config.Host + "/api/v2/torrents/add",
 		Cookie:      c.ck,
 		Referer:     c.config.Host,
 		ContentType: writer.FormDataContentType(),
-	}).Post(nil, payload)
+		Body:        payload,
+	}).Request()
 	if err != nil || resp.StatusCode != 200 {
 		return fmt.Errorf("添加种子失败: %v", err)
 	}
