@@ -3,6 +3,7 @@ package btsite_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/heibizi/go-media-kit/btsite"
 	"os"
 	"testing"
@@ -11,7 +12,11 @@ import (
 var client btsite.Client
 
 func TestMain(m *testing.M) {
-	btsite.InitConfig(os.Getenv("GO_BTSITE_CONFIGS_PATH"))
+	err := btsite.InitConfig(os.Getenv("GO_BTSITE_CONFIGS_PATH"))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	client, _ = btsite.NewClient(context.Background(), &btsite.Site{
 		Code:      os.Getenv("GO_BTSITE_CODE"),
 		Name:      os.Getenv("GO_BTSITE_NAME"),

@@ -2,6 +2,7 @@ package qb_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/heibizi/go-media-kit/downloader"
 	"github.com/heibizi/go-media-kit/downloader/qb"
 	"os"
@@ -18,7 +19,8 @@ func TestMain(m *testing.M) {
 	})
 	err := client.Login()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	m.Run()
 }

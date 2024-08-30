@@ -21,7 +21,8 @@ func loadConfig(file string) siteadapt.Config {
 	b, _ := io.ReadAll(f)
 	c, err := siteadapt.NewConfigReader(b).Read()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	return *c
 }

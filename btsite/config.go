@@ -2,6 +2,7 @@ package btsite
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/heibizi/go-media-kit/core/utils/mapstructurex"
 	"github.com/heibizi/go-media-kit/siteadapt"
@@ -51,23 +52,23 @@ type (
 )
 
 // InitConfig 初始化站点适配文件
-func InitConfig(path string) {
+func InitConfig(path string) error {
 	if len(path) == 0 {
-		panic("站点配置文件路径未配置")
+		return errors.New("站点配置文件路径未配置")
 	}
 	_, err := os.Stat(path)
 	if err != nil && os.IsNotExist(err) {
-		panic(fmt.Errorf("站点配置文件路径错误: %s", path))
+		return fmt.Errorf("站点配置文件路径错误: %s", path)
 	}
 	conf := AdaptCfg{}
 	common, err := loadCommonConfigs(path)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	conf.Common = common
 	configs, err := loadSiteConfigs(path)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	conf.Configs = configs
 	for i := range conf.Configs {
@@ -91,6 +92,7 @@ func InitConfig(path string) {
 		}
 	}
 	globalConfig = conf
+	return nil
 }
 
 func extend(rd *siteadapt.RequestDefinition, schemaRd *siteadapt.RequestDefinition) {
@@ -187,7 +189,10 @@ func loadCommonConfigs(path string) (map[string]Config, error) {
 			return nil, fmt.Errorf("加载公共配置异常: %v", err)
 		}
 		common.Config = *config
-		checkSearchFields(common.RequestDefinitions)
+		err = checkSearchFields(common.RequestDefinitions)
+		if err != nil {
+			return nil, err
+		}
 		commons[common.Id] = common
 	}
 	return commons, nil
@@ -213,7 +218,10 @@ func loadSiteConfigs(path string) ([]Config, error) {
 			return nil, fmt.Errorf("加载站点配置异常: %v", err)
 		}
 		sc.Config = *config
-		checkSearchFields(sc.RequestDefinitions)
+		err = checkSearchFields(sc.RequestDefinitions)
+		if err != nil {
+			return nil, err
+		}
 		siteConfigs = append(siteConfigs, sc)
 	}
 	return siteConfigs, err
@@ -221,10 +229,10 @@ func loadSiteConfigs(path string) ([]Config, error) {
 
 var validFields = []string{"id", "category", "title", "details", "download", "size", "grabs", "seeders",
 	"leechers", "date_elapsed", "date_added", "downloadvolumefactor", "uploadvolumefactor", "description",
-	"labels", "hr_days", "imdbid"}
+	"labels", "hr_days"}
 
 // checkSearchFields 检查搜索字段，为了 json 的简洁性强制性要求不能乱配置
-func checkSearchFields(rds map[string]siteadapt.RequestDefinition) {
+func checkSearchFields(rds map[string]siteadapt.RequestDefinition) error {
 	fields := rds["search"].Fields
 	for name := range fields {
 		valid := false
@@ -235,7 +243,8 @@ func checkSearchFields(rds map[string]siteadapt.RequestDefinition) {
 			}
 		}
 		if !valid {
-			panic(fmt.Errorf("为了适配文件的简洁性，强制要求 field 按照规则配置，搜索字段不合法: %s", name))
+			return fmt.Errorf("为了适配文件的简洁性，强制要求 field 按照规则配置，搜索字段不合法: %s", name)
 		}
 	}
+	return nil
 }
