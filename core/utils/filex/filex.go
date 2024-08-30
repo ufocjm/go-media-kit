@@ -6,21 +6,20 @@ import (
 	"path/filepath"
 )
 
-func CreateFile(dir string, fileName string, data []byte) error {
-	f := filepath.Join(dir, fileName)
+func CreateFile(fileName string, data []byte) error {
 	// 确保目录存在
-	fileDir := filepath.Dir(f)
+	fileDir := filepath.Dir(fileName)
 	if err := os.MkdirAll(fileDir, 0755); err != nil {
 		return fmt.Errorf("创建目录失败: %s", fileDir)
 	}
-	file, err := os.Create(f)
+	file, err := os.Create(fileName)
 	if err != nil {
-		return fmt.Errorf("创建文件失败: %s", f)
+		return fmt.Errorf("创建文件失败: %s", fileName)
 	}
 	defer file.Close()
 	_, err = file.Write(data)
 	if err != nil {
-		return fmt.Errorf("写入文件失败: %s", f)
+		return fmt.Errorf("写入文件失败: %s", fileName)
 	}
 	return nil
 }
