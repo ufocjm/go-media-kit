@@ -11,5 +11,9 @@ type timestampFilter struct {
 }
 
 func (f timestampFilter) doFilter() (string, error) {
-	return fmt.Sprintf("%d", stringx.TimeStamp(f.text)), nil
+	timeStamp := stringx.TimeStamp(f.text)
+	if timeStamp == 0 {
+		return "", nil
+	}
+	return fmt.Sprintf("%d", timeStamp), nil
 }
