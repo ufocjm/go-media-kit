@@ -45,8 +45,8 @@ type (
 		// Price 促销配置
 		Price struct {
 			HasFree   bool `mapstructure:"has_free"`    // 是否有 FREE
-			Has2XFree bool `mapstructure:"has_2x_free"` // 是否有 2XFree
-			HasHR     bool `mapstructure:"has_hr"`      // 是否有 HR
+			Has2xFree bool `mapstructure:"has_2x_free"` // 是否有 2XFree
+			HasHr     bool `mapstructure:"has_hr"`      // 是否有 HR
 		} `mapstructure:"price"`
 	}
 )
@@ -119,6 +119,9 @@ func extend(rd *siteadapt.RequestDefinition, schemaRd *siteadapt.RequestDefiniti
 	}
 	if !rd.DisabledExtends.FormData && rd.FormData == nil {
 		rd.FormData = schemaRd.FormData
+	}
+	if !rd.DisabledExtends.Body && rd.Body == nil {
+		rd.Body = schemaRd.Body
 	}
 	if !rd.DisabledExtends.SuccessStatusCodes && rd.SuccessStatusCodes == nil {
 		rd.SuccessStatusCodes = schemaRd.SuccessStatusCodes

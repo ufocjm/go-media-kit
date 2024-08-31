@@ -18,10 +18,9 @@ type (
 	// Field 站点请求字段定义
 	Field struct {
 		Name           string           // 不需要填写
-		List           *List            `mapstructure:"list,optional"` // 列表数据配置
 		Selector       string           `mapstructure:"selector"`      // 选择器表达式，不同解析类型有不同的表达式
 		Selection      string           `mapstructure:"selection"`     // 选择器文本类型，见：FieldSelection
-		Attribute      string           `mapstructure:"attribute"`     // 用于 HTML 解析
+		Attribute      string           `mapstructure:"attribute"`     // 用于 css 选择器解析
 		Filters        []Filter         `mapstructure:"filters"`       // 过滤器，链式处理
 		Parent         bool             `mapstructure:"parent"`        // 是否选择父元素
 		ChildrenRemove string           `mapstructure:"remove"`        // 用于 HTML 解析，移除指定元素的子元素
@@ -29,6 +28,7 @@ type (
 		Array          bool             `mapstructure:"array"`         // 是否为数组
 		Fields         map[string]Field `mapstructure:"fields"`        // 字段嵌套，意味着可以多层解析
 		FieldsRef      string           `mapstructure:"fields_ref"`    // 字段嵌套引用 CommonFields
+		List           *List            `mapstructure:"list,optional"` // 列表数据配置
 		TrimChars      bool             `mapstructure:"trim_chars"`    // 是否去除特殊字符
 	}
 	// Filter 站点请求字段过滤器
@@ -62,6 +62,7 @@ type (
 			RequiredHeaders    bool `mapstructure:"required_headers"`
 			Params             bool `mapstructure:"params"`
 			FormData           bool `mapstructure:"form_data"`
+			Body               bool `mapstructure:"body"`
 			SuccessStatusCodes bool `mapstructure:"success_status_codes"`
 			List               bool `mapstructure:"list"`
 			Fields             bool `mapstructure:"fields"`

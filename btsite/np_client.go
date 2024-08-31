@@ -237,7 +237,7 @@ func (c *npClient) MyHr() ([]HrTorrent, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !sc.Price.HasHR {
+	if !sc.Price.HasHr {
 		return nil, nil
 	}
 	var hrList []HrTorrent
