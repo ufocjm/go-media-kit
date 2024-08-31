@@ -102,12 +102,12 @@ flowchart TB
 
 解析器，用于解析站点的配置文件，目前支持以下解析器
 
-| 名称          | 描述                                              |
-|-------------|-------------------------------------------------|
-| CssSelector | css 选择器。                                        |
-| XPath       | XPath 选择器。                                      |
-| JsonPath    | JsonPath，使用方法：https://github.com/tidwall/gjson。 |
-| None        | 不解析，特殊站点需要写代码解析。                                |
+| 名称          | 描述                                                                               |
+|-------------|----------------------------------------------------------------------------------|
+| CssSelector | css 选择器。                                                                         |
+| XPath       | XPath 选择器。                                                                       |
+| JsonPath    | JsonPath，使用方法：https://github.com/tidwall/gjson。 注：这种方式可以不写 selector 表达式, 默认使用字段名 |
+| None        | 不解析，特殊站点需要写代码解析。                                                                 |
 
 ### filter
 
