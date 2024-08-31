@@ -48,7 +48,18 @@ func (p *htmlParser) parseArray(item *goquery.Selection, field Field) ([]string,
 }
 
 func (p *htmlParser) parseString(item *goquery.Selection, field Field) (string, error) {
-	return p.parse(item.Find(field.Selector), field)
+	ss := item.Find(field.Selector)
+	for i := range ss.Size() {
+		node := ss.Eq(i)
+		text, err := p.parse(node, field)
+		if err != nil {
+			return "", err
+		}
+		if len(text) > 0 {
+			return text, nil
+		}
+	}
+	return "", nil
 }
 
 func (p *htmlParser) parse(item *goquery.Selection, field Field) (string, error) {

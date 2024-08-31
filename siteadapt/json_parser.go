@@ -35,7 +35,17 @@ func (p *jsonParser) parseArray(item gjson.Result, field Field) ([]string, error
 }
 
 func (p *jsonParser) parseString(item gjson.Result, field Field) (string, error) {
-	return p.parse(item.Get(p.defaultSelector(field)), field)
+	r := item.Get(p.defaultSelector(field))
+	for _, node := range r.Array() {
+		text, err := p.parse(node, field)
+		if err != nil {
+			return "", err
+		}
+		if len(text) > 0 {
+			return text, nil
+		}
+	}
+	return "", nil
 }
 
 func (p *jsonParser) parse(item gjson.Result, field Field) (string, error) {

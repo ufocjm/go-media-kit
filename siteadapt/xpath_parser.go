@@ -42,7 +42,16 @@ func (p *xPathParser) parseArray(item *html.Node, field Field) ([]string, error)
 }
 
 func (p *xPathParser) parseString(item *html.Node, field Field) (string, error) {
-	return p.parse(htmlquery.FindOne(item, field.Selector), field)
+	for _, node := range htmlquery.Find(item, field.Selector) {
+		text, err := p.parse(node, field)
+		if err != nil {
+			return "", err
+		}
+		if len(text) > 0 {
+			return text, nil
+		}
+	}
+	return "", nil
 }
 
 func (p *xPathParser) parse(item *html.Node, field Field) (string, error) {
