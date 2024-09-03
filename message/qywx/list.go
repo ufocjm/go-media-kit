@@ -18,7 +18,7 @@ func (c *Client) SendList(req message.ListMessageReq) error {
 	return c.send(imageMessage{
 		ToUser:  c.userId(),
 		MsgType: "news",
-		AgentID: c.AgentId,
+		AgentId: c.AgentId,
 		News: news{
 			Articles: articles,
 		},

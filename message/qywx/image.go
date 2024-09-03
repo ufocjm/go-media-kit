@@ -9,7 +9,7 @@ func (c *Client) SendImage(req message.ImageMessageReq) error {
 	return c.send(imageMessage{
 		ToUser:  c.userId(),
 		MsgType: "news",
-		AgentID: c.AgentId,
+		AgentId: c.AgentId,
 		News: news{
 			Articles: []article{
 				{

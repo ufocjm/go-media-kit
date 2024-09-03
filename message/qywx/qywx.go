@@ -43,10 +43,10 @@ type (
 	messageReq struct {
 		ToUser               string      `json:"touser"`
 		MsgType              string      `json:"msgtype"`
-		AgentID              string      `json:"agentid"`
+		AgentId              string      `json:"agentid"`
 		Text                 textMessage `json:"text"`
 		Safe                 int         `json:"safe"`
-		EnableIDTrans        int         `json:"enable_id_trans"`
+		EnableIdTrans        int         `json:"enable_id_trans"`
 		EnableDuplicateCheck int         `json:"enable_duplicate_check"`
 	}
 
@@ -57,7 +57,7 @@ type (
 	imageMessage struct {
 		ToUser  string `json:"touser"`
 		MsgType string `json:"msgtype"`
-		AgentID string `json:"agentid"`
+		AgentId string `json:"agentid"`
 		News    news   `json:"news"`
 	}
 

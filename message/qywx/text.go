@@ -19,10 +19,10 @@ func (c *Client) SendText(req message.TextMessageReq) error {
 	return c.send(messageReq{
 		ToUser:               c.userId(),
 		MsgType:              "text",
-		AgentID:              c.AgentId,
+		AgentId:              c.AgentId,
 		Text:                 textMessage{content},
 		Safe:                 0,
-		EnableIDTrans:        0,
+		EnableIdTrans:        0,
 		EnableDuplicateCheck: 0,
 	}, true)
 }
