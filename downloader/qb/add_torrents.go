@@ -9,18 +9,28 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 type AddTorrentsInfo struct {
-	Urls         string   `json:"urls"`
-	Torrents     []string `json:"torrents"`
-	SavePath     string   `json:"savePath"`
-	Category     string   `json:"category"`
-	Tags         string   `json:"tags"`
-	SkipChecking bool     `json:"skipChecking"`
-	Paused       bool     `json:"paused"`
-	RootFolder   bool     `json:"rootFolder"`
-	AutoTMM      bool     `json:"autoTMM"`
+	Urls               []string `json:"urls"`
+	Torrents           []string `json:"torrents"`
+	SavePath           string   `json:"savePath"`
+	Cookie             string   `json:"cookie"`
+	Category           string   `json:"category"`
+	Tags               []string `json:"tags"`
+	SkipChecking       bool     `json:"skipChecking"`
+	Paused             bool     `json:"paused"`
+	RootFolder         bool     `json:"rootFolder"`
+	Rename             string   `json:"rename"`
+	UpLimit            int      `json:"upLimit"` // bytes/second
+	DlLimit            int      `json:"dlLimit"` // bytes/second
+	RatioLimit         float64  `json:"ratioLimit"`
+	SeedingTimeLimit   int      `json:"seedingTimeLimit"` // minutes
+	AutoTMM            bool     `json:"autoTMM"`
+	SequentialDownload bool     `json:"sequentialDownload"`
+	FirstLastPiecePrio bool     `json:"firstLastPiecePrio"`
 }
 
 func (c *Client) AddTorrents(req any) error {
@@ -28,18 +38,22 @@ func (c *Client) AddTorrents(req any) error {
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
 	params := map[string]string{
-		"urls":               info.Urls,
-		"paused":             fmt.Sprintf("%t", info.Paused),
-		"skip_checking":      fmt.Sprintf("%t", info.SkipChecking),
-		"autoTMM":            fmt.Sprintf("%t", info.AutoTMM),
-		"sequentialDownload": "false",
-		"firstLastPiecePrio": "false",
-		"contentLayout":      "Original",
-		"stopCondition":      "None",
-		"root_folder":        fmt.Sprintf("%t", info.RootFolder),
-		"tags":               info.Tags,
-		"category":           info.Category,
+		"urls":               strings.Join(info.Urls, "\n"),
 		"savepath":           info.SavePath,
+		"cookie":             info.Cookie,
+		"category":           info.Category,
+		"tags":               strings.Join(info.Tags, ","),
+		"skip_checking":      fmt.Sprintf("%t", info.SkipChecking),
+		"paused":             fmt.Sprintf("%t", info.Paused),
+		"root_folder":        fmt.Sprintf("%t", info.RootFolder),
+		"rename":             info.Rename,
+		"upLimit":            strconv.Itoa(info.UpLimit),
+		"dlLimit":            strconv.Itoa(info.DlLimit),
+		"ratioLimit":         fmt.Sprintf("%f", info.RatioLimit),
+		"seedingTimeLimit":   strconv.Itoa(info.SeedingTimeLimit),
+		"autoTMM":            fmt.Sprintf("%t", info.AutoTMM),
+		"sequentialDownload": fmt.Sprintf("%t", info.SequentialDownload),
+		"firstLastPiecePrio": fmt.Sprintf("%t", info.FirstLastPiecePrio),
 	}
 	for k, v := range params {
 		err := writer.WriteField(k, v)

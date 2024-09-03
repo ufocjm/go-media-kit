@@ -180,7 +180,7 @@ func parseArrayOrString[T any](parser parser[T], item T, field Field) (any, erro
 	}
 }
 
-var trimCharList = []string{"\n", "\r", "\t", " ("}
+var trimCharList = []string{"\n", "\r", "\t", " (", "\""}
 
 // filterText 文本过滤
 func filterText(text string, filters []Filter, trimChars bool) (string, error) {
