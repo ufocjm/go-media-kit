@@ -22,8 +22,8 @@ type (
 	}
 
 	resp struct {
-		ErrCode int    `json:"errcode"`
-		ErrMsg  string `json:"errmsg"`
+		ErrCode int    `json:"code"`
+		ErrMsg  string `json:"msg"`
 	}
 
 	messageReq struct {
