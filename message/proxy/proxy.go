@@ -5,6 +5,7 @@ import (
 	"github.com/heibizi/go-media-kit/message"
 	"github.com/heibizi/go-media-kit/message/iyuu"
 	"github.com/heibizi/go-media-kit/message/qywx"
+	"github.com/heibizi/go-media-kit/message/serverchan"
 )
 
 type ClientProxy struct {
@@ -18,6 +19,8 @@ func NewClientProxy(config any) *ClientProxy {
 		client = qywx.NewClient(t)
 	case iyuu.Config:
 		client = iyuu.NewClient(t)
+	case serverchan.Config:
+		client = serverchan.NewClient(t)
 	}
 
 	return &ClientProxy{
