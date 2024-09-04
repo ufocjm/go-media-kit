@@ -10,19 +10,21 @@ type ClientProxy struct {
 	client message.Client
 }
 
-var clientFactoryRegistry = map[message.ClientType]func(config any) message.Client{
-	message.WorkWechat: func(config any) message.Client {
-		return qywx.NewClient(config.(qywx.Config))
-	},
-}
-
-func NewClientProxy(clientType message.ClientType, config any) *ClientProxy {
+func NewClientProxy(config any) *ClientProxy {
+	var client message.Client
+	switch t := config.(type) {
+	case qywx.Config:
+		client = qywx.NewClient(t)
+	}
 	return &ClientProxy{
-		client: clientFactoryRegistry[clientType](config),
+		client: client,
 	}
 }
 
 func (p *ClientProxy) Send(req any) error {
+	if p.client == nil {
+		return errors.New("invalid config type")
+	}
 	switch m := req.(type) {
 	case message.TextMessageReq:
 		return p.client.SendText(m)
