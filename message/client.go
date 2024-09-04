@@ -15,4 +15,5 @@ type ClientType int
 
 const (
 	WorkWechat ClientType = iota
+	IYUU       ClientType = iota
 )

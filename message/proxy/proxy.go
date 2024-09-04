@@ -3,6 +3,7 @@ package proxy
 import (
 	"errors"
 	"github.com/heibizi/go-media-kit/message"
+	"github.com/heibizi/go-media-kit/message/iyuu"
 	"github.com/heibizi/go-media-kit/message/qywx"
 )
 
@@ -13,6 +14,9 @@ type ClientProxy struct {
 var clientFactoryRegistry = map[message.ClientType]func(config any) message.Client{
 	message.WorkWechat: func(config any) message.Client {
 		return qywx.NewClient(config.(qywx.Config))
+	},
+	message.IYUU: func(config any) message.Client {
+		return iyuu.NewClient(config.(iyuu.Config))
 	},
 }
 
