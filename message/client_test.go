@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 		UserId:      "",
 		RedisClient: redis.NewClient(&redis.Options{Addr: os.Getenv("GO_QYWX_REDIS_ADDR")}),
 	})
-	iyuuClientProxy = proxy.NewClientProxy(message.IYUU, iyuu.Config{
+	iyuuClientProxy = proxy.NewClientProxy(iyuu.Config{
 		Ctx:   context.Background(),
 		Token: os.Getenv("GO_IYUU_TOKEN"),
 	})

@@ -3,6 +3,7 @@ package proxy
 import (
 	"errors"
 	"github.com/heibizi/go-media-kit/message"
+	"github.com/heibizi/go-media-kit/message/iyuu"
 	"github.com/heibizi/go-media-kit/message/qywx"
 )
 
@@ -15,7 +16,10 @@ func NewClientProxy(config any) *ClientProxy {
 	switch t := config.(type) {
 	case qywx.Config:
 		client = qywx.NewClient(t)
+	case iyuu.Config:
+		client = iyuu.NewClient(t)
 	}
+
 	return &ClientProxy{
 		client: client,
 	}
