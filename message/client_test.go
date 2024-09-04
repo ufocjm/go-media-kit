@@ -15,7 +15,7 @@ var clientProxy *proxy.ClientProxy
 var iyuuClientProxy *proxy.ClientProxy
 
 func TestMain(m *testing.M) {
-	clientProxy = proxy.NewClientProxy(message.WorkWechat, qywx.Config{
+	clientProxy = proxy.NewClientProxy(qywx.Config{
 		Ctx:         context.Background(),
 		CorpId:      os.Getenv("GO_QYWX_CORP_ID"),
 		CorpSecret:  os.Getenv("GO_QYWX_CORP_SECRET"),
